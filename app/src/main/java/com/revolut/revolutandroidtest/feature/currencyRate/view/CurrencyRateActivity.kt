@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -137,12 +138,12 @@ class CurrencyRateActivity : AppCompatActivity(), ListOfCurrencyAdapter.Operatio
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         if (!fromFocus) {
             if (!s.isNullOrBlank()) {
-                Log.e(App.TAG, "Not Null Or Blank ,setValue($s)")
+                Log.d(App.TAG, "Not Null Or Blank ,setValue($s)")
                 // update the value for each currency.
                 currentValue = get2Digit(s.toString().toDouble())
                 mListOfCurrencyAdapter.updateShownValues(currentValue)
             } else {
-                Log.e(App.TAG, "clearAll")
+                Log.d(App.TAG, "clearAll")
                 currentValue = 0.0
                 // clear all values that shown to user.
                 mListOfCurrencyAdapter.clearAll()
@@ -156,7 +157,7 @@ class CurrencyRateActivity : AppCompatActivity(), ListOfCurrencyAdapter.Operatio
      * @param value
      */
     override fun updateTheFirstFiledValue(position: Int, value: Currency) {
-        Timber.d(App.TAG, "updateTheFirstFiledValue/valueBefore:$value")
+        Log.d(App.TAG, "updateTheFirstFiledValue/valueBefore:$value")
         // from focus to stop the text watcher listener to listen of changing.
         fromFocus = true
         // edit the first item view
@@ -171,28 +172,27 @@ class CurrencyRateActivity : AppCompatActivity(), ListOfCurrencyAdapter.Operatio
 
         // from focus to return the text watcher listener to listen of changing.
         fromFocus = false
-
         // update the adapter
         mListOfCurrencyAdapter.mCurrencyList.removeAt(position)
         mListOfCurrencyAdapter.notifyItemRemoved(position)
 
         mListOfCurrencyAdapter.mCurrencyList.add(0, currency)
         mListOfCurrencyAdapter.notifyItemInserted(0)
-
         // set the new value
         currency = value
 
         // update the value of based on the selected currency.
         mListOfCurrencyAdapter.mCurrencyList.forEach {
-            Timber.d(App.TAG, "ListValueBefore:$it")
+            Log.d(App.TAG, "ListValueBefore:$it")
             it.value = it.value / currency.value
             it.showValue = get2Digit(it.value * currency.showValue)
-            Log.e(App.TAG, "ListValueAfter:$it")
+            Log.d(App.TAG, "ListValueAfter:$it")
         }
         mListOfCurrencyAdapter.notifyDataSetChanged()
+
         // reset the selected currency to 1.0
         currency.value = 1.00
-        Timber.d(App.TAG, "updateTheFirstFiledValue/valueAfter:$currency")
+        Log.d(App.TAG, "updateTheFirstFiledValue/valueAfter:$currency")
 
 
     }
